@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import winsound
-
+import configparser
 
 def alert():
     print("ALERT!!!")
@@ -12,28 +12,42 @@ def alert():
     return
 
 
-driver = webdriver.Chrome()
-print("waiting to login")
-url = driver.command_executor._url
-print(url)
-session_id = driver.session_id
-print(session_id)
-exit(0)
+config = configparser.ConfigParser()
+config.read('config.ini')
 
-# url = "http://127.0.0.1:54795"
-# session_id = "0958dfdd1b2a4edda5ba45d202730bf7"
-# driver = webdriver.Remote(command_executor=url, desired_capabilities={})
-# driver.session_id = session_id
+if not "REMOTE" in config:
+    driver = webdriver.Chrome()
+    print("waiting to login")
+    url = driver.command_executor._url
+    session_id = driver.session_id
 
-# driver.get("http://usis.yildiz.edu.tr/main.jsp")
+    config["REMOTE"] = {}
+    config["REMOTE"]["url"] = url
+    config["REMOTE"]["session_id"] = session_id
+    print(url)
+    print(session_id)
+
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
+
+    print("Lütfen Login olunuz.")
+
+    driver.get("http://usis.yildiz.edu.tr/main.jsp")
+    exit(0)
+
+url = config["REMOTE"]["url"]
+session_id = config["REMOTE"]["session_id"]
+driver = webdriver.Remote(command_executor=url, desired_capabilities={})
+driver.session_id = session_id
 
 
+print("Usis in bulunduğu pencere aranıyor.")
 handles = driver.window_handles
 size = len(handles)
 for x in range(size):
     driver.switch_to.window(handles[x])
     print(driver.current_url)
-    if driver.current_url == "http://usis.yildiz.edu.tr/CrsListOfferedCourses.do":
+    if "http://usis.yildiz.edu.tr/" in driver.current_url:
         break
 
 alert()
