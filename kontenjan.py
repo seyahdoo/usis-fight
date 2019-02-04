@@ -12,18 +12,18 @@ def alert():
     return
 
 
-# driver = webdriver.Chrome()
-# print("waiting to login")
-# url = driver.command_executor._url
-# print(url)
-# session_id = driver.session_id
-# print(session_id)
-# exit(0)
+driver = webdriver.Chrome()
+print("waiting to login")
+url = driver.command_executor._url
+print(url)
+session_id = driver.session_id
+print(session_id)
+exit(0)
 
-url = "http://127.0.0.1:54085"
-session_id = "3cf17ed03d23c19e936af8c91cff5825"
-driver = webdriver.Remote(command_executor=url, desired_capabilities={})
-driver.session_id = session_id
+# url = "http://127.0.0.1:54795"
+# session_id = "0958dfdd1b2a4edda5ba45d202730bf7"
+# driver = webdriver.Remote(command_executor=url, desired_capabilities={})
+# driver.session_id = session_id
 
 # driver.get("http://usis.yildiz.edu.tr/main.jsp")
 
@@ -38,35 +38,38 @@ for x in range(size):
 
 alert()
 
+def kontrol(ders_kod, ders_grup, mevcut_kontenjan, ders_isim):
+    try:
+        elems = driver.find_elements_by_xpath("//td[contains(text(),'" + ders_kod + "')]")
+        pr = elems[ders_grup].find_element_by_xpath('..')
+        ih: str = pr.get_attribute('innerHTML')
+        if mevcut_kontenjan in ih:
+            print("{} {} hala dolu".format(ders_kod, ders_isim))
+        else:
+            print("ALERT!!!")
+            print("{} {} ŞUAN AÇIK!!!!!".format(ders_kod, ders_isim))
+            alert()
+    except Exception as e:
+        print(e)
+        print("{} {} Bulunamadı, bir sorun olmalı???".format(ders_kod, ders_isim))
+
+def isvisible(ders_kod, ders_isim):
+    try:
+        elem = driver.find_element_by_xpath("//td[contains(text(),'{}')]".format(ders_kod))
+        print("Actually found ALERT!!")
+        print("{} {} ŞUAN AÇIK!!!!!".format(ders_kod, ders_isim))
+        alert()
+    except Exception as e:
+        print("{} {} Hala bulunamadı".format(ders_kod, ders_isim))
+
 while True:
     time.sleep(2)
     driver.get("http://usis.yildiz.edu.tr/CrsListOfferedCourses.do")
     time.sleep(1)
     driver.get("http://usis.yildiz.edu.tr/CrsListOfferedCoursesPrint.jsp")
 
-    ders_kod = "BLM3810"
-    ders_grup = 0
-    mevcut_kontenjan = "30/30"
+    kontrol("BLM3810",0,"55/53", "Biyoenformatiğe Giriş")
+    isvisible("BLM0000","Hayalet Ders")
 
-    try:
-        elems = driver.find_elements_by_xpath("//td[contains(text(),'" + ders_kod + "')]")
-        pr = elems[ders_grup].find_element_by_xpath('..')
-        ih: str = pr.get_attribute('innerHTML')
-        if mevcut_kontenjan in ih:
-            print("Biyoenformatiğe Giriş hala dolu")
-        else:
-            print("ALERT!!!")
-            print("BLM3810 Biyoenformatiğe Giriş ŞUAN AÇIK!!!!!")
-            alert()
-    except Exception as e:
-        print(e)
-        print("not found")
 
-    # try:
-    #     elem = driver.find_element_by_xpath("//td[contains(text(),'BLM3520')]")
-    #     print("Actually found ALERT!!")
-    #     print("BLM3520 Mobil ŞUAN AÇIK!!!!!")
-    #     alert()
-    # except Exception as e:
-    #     print("not found")
 
